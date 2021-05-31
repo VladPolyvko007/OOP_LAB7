@@ -1,0 +1,163 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+template <typename type>
+
+class arr
+{
+private:
+    vector<type> Array;
+    int max_size;
+    bool size_possible;
+
+    auto find_by_index(int index);
+
+public:
+    arr() {}
+    arr(int maxs) : max_size(maxs), size_possible(true) {}
+    type at(int index) { return (*this)[index]; }
+    void operator += (type elem)
+    {
+        Array.push_back(elem);
+    }
+    arr& operator += (const arr<type>& obj)
+    {
+        for (auto it : obj.Array)
+        {
+            Array.push_back(it);
+        }
+        return *this;
+    }
+    void operator --(int obj) { Array.pop_back(); }
+    bool operator ==(const arr& obj)
+    {
+        return equal(Array.begin(), Array.end(),
+            obj.Array.begin(), obj.Array.end());
+    }
+    friend ostream& operator << (ostream& os, arr& obj)
+    {
+        for (auto it = obj.Array.begin(); it != obj.Array.end(); it++)
+        {
+            os << *it << " ";
+        }
+        return os;
+    }
+    ifstream& operator >> (ifstream& fs)
+    {
+        type val;
+        while (!fs.eof())
+        {
+            fs >> val;
+            Array.push_back(val);
+        }
+        return fs;
+    }
+    ofstream& operator << (ofstream& fs)
+    {
+        fs << '\n' << "Запиc у файл!" << '\n';
+        for (auto it : Array)
+        {
+            fs << it << " ";
+        }
+        return fs;
+    }
+    type operator()()
+    {
+        type max;
+        max = *Array.begin();
+        for (auto it = Array.begin(); it != Array.end(); it++)
+        {
+            if (*it > max)
+                max = *it;
+        }
+        return max;
+    }
+};
+
+template<typename type>
+
+auto arr<type>::find_by_index(int index)
+{
+    auto it = Array.begin();
+    int i = 0;
+    do
+    {
+        if (it == Array.end())
+        {
+            it = Array.begin();
+        }
+        else
+        {
+            it++;
+        }
+        i++;
+    } while (i < index + 1);
+    return it;
+}
+
+void ShowFileContent(fstream& fs)
+{
+    fs.seekg(0, ios::beg);
+    string text;
+    while (!fs.eof())
+    {
+        fs >> text;
+        cout << text << endl;
+    }
+}
+
+int main()
+{
+    arr<int> arr1;
+    arr<int> arr2;
+
+    arr1 += 45;
+    arr1 += 4;
+    arr1 += 542;
+    arr1--;
+    arr2 += 32;
+    arr2 += 89;
+    arr2 += 32;
+    arr2 += arr1;
+
+    cout << "arr2" << endl;
+    cout << arr2 << endl;
+    cout << "Max elem: " << arr2() << endl;
+    cout << "\n";
+
+    arr<string> arr3;
+    arr<string> arr4;
+
+    arr3 += "Bubble";
+    arr3 += "Sorting";
+    arr4 += "!";
+    arr4--;
+    arr4 += "Operator";
+    arr4 += arr3;
+    cout << "arr4" << endl;
+    cout << arr4 << endl;
+    cout << "Max elem: " << arr4() << endl;
+    cout << "\n";
+
+    arr<double> arr5;
+    ifstream read;
+    ofstream write;
+    string p_write = "D:\\Університет\\2.txt";
+    string p_read = "D:\\Університет\\1.txt";
+    read.open(p_read);
+    write.open(p_write, ios::ate | ios::in);
+
+    arr5 >> read;
+    arr5 << write;
+    cout << "arr5" << endl;
+    cout << arr5 << endl;
+    cout << "Max elem: " << arr5() << endl;
+    cout << "\n";
+
+    arr2 << write;
+    read.close();
+    write.close();
+}
